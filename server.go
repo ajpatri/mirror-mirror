@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -9,6 +10,12 @@ import (
 	"net/http"
 	"os"
 )
+
+type Message struct {
+	Address    string `json:"address"`
+	UserAgent  string `json:"user_agent"`
+	DomainName string `json:"domain_name"`
+}
 
 func main() {
 	hostPtr := flag.String("host", "0.0.0.0", "Host address to listen on")
@@ -44,6 +51,7 @@ func main() {
 
 func handler(writer http.ResponseWriter, request *http.Request) {
 	var addr, err = extractAddressFromSocket(request.RemoteAddr)
+
 	if err != nil {
 		fmt.Fprintf(writer, "Ip address was whack.")
 		return
@@ -55,13 +63,20 @@ func handler(writer http.ResponseWriter, request *http.Request) {
 
 	var name = lookup(addr)
 
-	log.Printf("%s -- %s -- %s", addr, name, request.UserAgent())
+	data := Message{
+		Address:    addr,
+		UserAgent:  request.UserAgent(),
+		DomainName: name,
+	}
 
-	fmt.Fprintf(writer, "%s\n%s\n%s",
-		addr,
-		name,
-		request.UserAgent(),
-	)
+	log.Printf("%s -- %s -- %s", data.Address, data.DomainName, data.UserAgent)
+
+	writer.Header().Set("Content-Type", "application/json")
+	writer.WriteHeader(http.StatusOK)
+
+	encoder := json.NewEncoder(writer)
+	encoder.SetIndent("", "  ")
+	encoder.Encode(data)
 }
 
 func lookup(addr string) string {
