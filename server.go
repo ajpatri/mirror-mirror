@@ -50,7 +50,7 @@ func handler(writer http.ResponseWriter, request *http.Request) {
 	}
 	realIP := request.Header.Get("X-Real-IP")
 	if realIP != "" {
-		addr := realIP
+		addr = realIP
 	}
 
 	var name = lookup(addr)
