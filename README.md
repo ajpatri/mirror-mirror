@@ -7,7 +7,7 @@ Go web server that lets you know where you're coming from. Incase you forgot.
 ## Install
 
 ```
-go get https://github.com/ajpatri/mirror-mirror
+go get github.com/ajpatri/mirror-mirror
 ```
 
 ## Usage
