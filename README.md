@@ -32,3 +32,13 @@ $ mirror-mirror -https -public cert.pem -private key.pem
 # Only locally
 $ mirror-mirror -host 127.0.0.1
 ```
+
+## Docker Usage
+
+```
+git clone git@github.com:ajpatri/mirror-mirror.git
+cd mirror-mirror
+sudo docker build -t mirror-mirror .
+sudo docker run -d -p 127.0.0.1:8080:8080 mirror-mirror
+```
+

@@ -48,6 +48,10 @@ func handler(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprintf(writer, "Ip address was whack.")
 		return
 	}
+	realIP := request.Header.Get("X-Real-IP")
+	if realIP != "" {
+		addr = realIP
+	}
 
 	var name = lookup(addr)
 
