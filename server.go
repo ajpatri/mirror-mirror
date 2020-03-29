@@ -49,7 +49,7 @@ func handler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	realIP := request.Header.Get("X-Real-IP")
-	if realIP != nil {
+	if realIP != "" {
 		addr := realIP
 	}
 
