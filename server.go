@@ -17,6 +17,10 @@ type Message struct {
 	DomainName string `json:"domain_name"`
 }
 
+type Error struct {
+	Message string `json:"error"`
+}
+
 func main() {
 	hostPtr := flag.String("host", "0.0.0.0", "Host address to listen on")
 	portPtr := flag.Int("port", 8080, "Port to listen on")
@@ -50,12 +54,20 @@ func main() {
 }
 
 func handler(writer http.ResponseWriter, request *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+	encoder := json.NewEncoder(writer)
+	encoder.SetIndent("", "  ")
+
 	var addr, err = extractAddressFromSocket(request.RemoteAddr)
 
 	if err != nil {
-		fmt.Fprintf(writer, "Ip address was whack.")
+		writer.WriteHeader(http.StatusBadRequest)
+		encoder.Encode(Error{
+			Message: "Ip address was whack.",
+		})
 		return
 	}
+
 	realIP := request.Header.Get("X-Real-IP")
 	if realIP != "" {
 		addr = realIP
@@ -71,11 +83,7 @@ func handler(writer http.ResponseWriter, request *http.Request) {
 
 	log.Printf("%s -- %s -- %s", data.Address, data.DomainName, data.UserAgent)
 
-	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
-
-	encoder := json.NewEncoder(writer)
-	encoder.SetIndent("", "  ")
 	encoder.Encode(data)
 }
 
